@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GEO brand evaluator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Semantic token layer — light theme ── */
+    :root {
+      /* Background */
+      --token-bg-canvas:        #f1f5f9;
+      --token-bg-surface:       #ffffff;
+      --token-bg-surface-hover: #f8fafc;
+      --token-bg-input:         #ffffff;
+
+      /* Border */
+      --token-border-default:   #e2e8f0;
+      --token-border-focus:     #6366f1;
+      --token-border-strong:    #cbd5e1;
+
+      /* Text */
+      --token-text-primary:     #0f172a;
+      --token-text-secondary:   #475569;
+      --token-text-muted:       #94a3b8;
+      --token-text-on-accent:   #ffffff;
+
+      /* Action */
+      --token-action-primary:       #6366f1;
+      --token-action-primary-hover: #4f46e5;
+      --token-action-primary-press: #4338ca;
+
+      /* Feedback */
+      --token-feedback-success:        #16a34a;
+      --token-feedback-success-subtle: #f0fdf4;
+      --token-feedback-warning:        #d97706;
+      --token-feedback-warning-subtle: #fffbeb;
+      --token-feedback-danger:         #dc2626;
+      --token-feedback-danger-subtle:  #fef2f2;
+      --token-feedback-neutral-subtle: #f8fafc;
+
+      /* Radius */
+      --radius-sm:   6px;
+      --radius-md:   10px;
+      --radius-lg:   16px;
+      --radius-xl:   20px;
+      --radius-full: 9999px;
+
+      /* Spacing */
+      --space-2:  2px;
+      --space-4:  4px;
+      --space-6:  6px;
+      --space-8:  8px;
+      --space-12: 12px;
+      --space-16: 16px;
+      --space-20: 20px;
+      --space-24: 24px;
+      --space-32: 32px;
+      --space-40: 40px;
+      --space-48: 48px;
+      --space-64: 64px;
+
+      /* Typography */
+      --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      --type-title-size:   2rem;
+      --type-title-weight: 800;
+      --type-title-lh:     1.2;
+
+      --type-h2-size:   0.6875rem;
+      --type-h2-weight: 600;
+      --type-h2-ls:     0.08em;
+
+      --type-label-1-size:   0.9375rem;
+      --type-label-1-weight: 600;
+
+      --type-label-2-size:   0.8125rem;
+      --type-label-2-weight: 500;
+
+      --type-body-size:  0.875rem;
+      --type-body-lh:    1.6;
+
+      --type-caption-size: 0.6875rem;
+      --type-caption-lh:   1.5;
+    }
+
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-family: var(--font-family); }
+
+    body {
+      background: var(--token-bg-canvas);
+      min-height: 100vh;
+      color: var(--token-text-primary);
+      padding: var(--space-48) var(--space-16);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Focus ── */
+    :focus-visible {
+      outline: 2px solid var(--token-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ── Surface card ── */
+    .surface {
+      background: var(--token-bg-surface);
+      border: 1px solid var(--token-border-default);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+    }
+
+    /* ── Layout ── */
+    .page { max-width: 52rem; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-20); }
+
+    /* ── Typography helpers ── */
+    .text-primary   { color: var(--token-text-primary); }
+    .text-secondary { color: var(--token-text-secondary); }
+    .text-muted     { color: var(--token-text-muted); }
+
+    /* ── Form field ── */
+    .field-group { display: flex; flex-direction: column; gap: var(--space-6); }
+    .field-label {
+      font-size: var(--type-label-2-size);
+      font-weight: var(--type-label-2-weight);
+      color: var(--token-text-secondary);
+    }
+    .field-input, .field-select {
+      width: 100%;
+      height: 44px;
+      padding: 0 var(--space-16);
+      background: var(--token-bg-input);
+      border: 1px solid var(--token-border-default);
+      border-radius: var(--radius-md);
+      color: var(--token-text-primary);
+      font-size: var(--type-body-size);
+      font-family: var(--font-family);
+      transition: border-color 0.15s;
+    }
+    .field-input::placeholder { color: var(--token-text-muted); }
+    .field-input:focus, .field-select:focus { outline: none; border-color: var(--token-border-focus); }
+    .field-select { appearance: none; cursor: pointer; }
+    .field-select option { background: #ffffff; color: var(--token-text-primary); }
+
+    /* ── Button — primary ── */
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: var(--space-8);
+      height: 44px;
+      padding: 0 var(--space-24);
+      background: var(--token-action-primary);
+      border: none; border-radius: var(--radius-md);
+      color: var(--token-text-on-accent);
+      font-size: var(--type-label-1-size);
+      font-weight: var(--type-label-1-weight);
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: background 0.15s;
+      width: 100%;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--token-action-primary-hover); }
+    .btn-primary:active:not(:disabled) { background: var(--token-action-primary-press); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Section header ── */
+    .section-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--token-text-muted);
+      margin-bottom: var(--space-16);
+    }
+
+    /* ── KPI card ── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-12); }
+    .kpi-card {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: var(--space-24) var(--space-16);
+    }
+    .kpi-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--token-text-muted);
+      margin-bottom: var(--space-12);
+    }
+
+    /* ── Gauge ── */
+    .gauge-wrap { position: relative; width: 120px; height: 120px; }
+    .gauge-wrap svg { transform: rotate(-90deg); width: 120px; height: 120px; }
+    .gauge-track { stroke: #e2e8f0; }
+    .gauge-fill  {
+      stroke-dasharray: 0 100;
+      stroke-linecap: round;
+      transition: stroke-dasharray 1.4s cubic-bezier(0.4,0,0.2,1), stroke 0.3s;
+    }
+    .gauge-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .gauge-num  { font-size: 2rem; font-weight: 800; line-height: 1; }
+    .gauge-unit { font-size: var(--type-caption-size); color: var(--token-text-muted); margin-top: 2px; }
+
+    /* ── Badge / pill ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: var(--space-4);
+      padding: 2px var(--space-8);
+      border-radius: var(--radius-full);
+      font-size: var(--type-caption-size);
+      font-weight: 600;
+    }
+    .badge-success { background: var(--token-feedback-success-subtle); color: #15803d; }
+    .badge-neutral { background: #f1f5f9; color: var(--token-text-secondary); border: 1px solid var(--token-border-default); }
+    .badge-high    { background: var(--token-feedback-danger-subtle);  color: #b91c1c; }
+    .badge-medium  { background: var(--token-feedback-warning-subtle); color: #92400e; }
+    .badge-low     { background: var(--token-feedback-success-subtle); color: #15803d; }
+
+    /* ── Progress bar ── */
+    .progress-track { width: 100%; height: 10px; background: #e2e8f0; border-radius: var(--radius-full); overflow: hidden; }
+    .progress-fill  { height: 100%; border-radius: var(--radius-full); transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+
+    /* ── Provider model toggles ── */
+    .provider-toggle {
+      display: inline-flex; align-items: center; gap: var(--space-6);
+      padding: var(--space-6) var(--space-12);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--token-border-default);
+      background: transparent;
+      color: var(--token-text-secondary);
+      font-size: var(--type-label-2-size);
+      font-weight: var(--type-label-2-weight);
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .provider-toggle[aria-pressed="true"] {
+      background: #eef2ff;
+      border-color: #a5b4fc;
+      color: #4338ca;
+    }
+    .provider-toggle[aria-disabled="true"] {
+      opacity: 0.25;
+      cursor: not-allowed;
+    }
+    .provider-toggle:not([aria-disabled="true"]):hover { background: var(--token-bg-surface-hover); }
+    .provider-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+    /* ── Example pill ── */
+    .example-pill {
+      display: inline-flex;
+      padding: var(--space-4) var(--space-12);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--token-border-default);
+      background: transparent;
+      color: var(--token-text-muted);
+      font-size: var(--type-caption-size);
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .example-pill:hover { background: #eef2ff; color: #4338ca; border-color: #a5b4fc; }
+
+    /* ── Status states ── */
+    .status-loading {
+      display: flex; align-items: center; justify-content: center; gap: var(--space-12);
+      padding: var(--space-48) 0;
+      color: var(--token-text-secondary);
+      font-size: var(--type-body-size);
+    }
+
+    .alert-error {
+      padding: var(--space-16) var(--space-20);
+      border-radius: var(--radius-lg);
+      background: var(--token-feedback-danger-subtle);
+      border: 1px solid #fecaca;
+    }
+    .alert-error .alert-title {
+      font-size: var(--type-label-2-size);
+      font-weight: 600;
+      color: #991b1b;
+      margin-bottom: var(--space-4);
+    }
+    .alert-error .alert-body { font-size: var(--type-caption-size); color: #b91c1c; }
+    .alert-error .alert-action { font-size: var(--type-caption-size); color: #b91c1c; opacity: 0.8; margin-top: var(--space-4); }
+
+    /* ── Provider result cards ── */
+    .provider-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
+      gap: var(--space-12);
+    }
+    .provider-result-card {
+      display: flex; flex-direction: column; align-items: center; gap: var(--space-8);
+      padding: var(--space-16) var(--space-12);
+      border-radius: var(--radius-lg);
+      background: #f8fafc;
+      border: 1px solid var(--token-border-default);
+    }
+    .provider-card-name {
+      font-size: var(--type-caption-size);
+      font-weight: 600;
+      color: var(--token-text-secondary);
+    }
+    .provider-card-score {
+      font-size: 1.625rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .provider-card-meta { font-size: var(--type-caption-size); color: var(--token-text-muted); text-align: center; }
+
+    /* ── Competitor table ── */
+    .comp-table { width: 100%; border-collapse: collapse; }
+    .comp-table th {
+      text-align: left;
+      font-size: var(--type-caption-size);
+      font-weight: 600;
+      color: var(--token-text-muted);
+      padding-bottom: var(--space-12);
+      border-bottom: 1px solid var(--token-border-default);
+    }
+    .comp-table th.center { text-align: center; }
+    .comp-table td { padding: var(--space-12) 0; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .comp-table tr.you-row td { background: #eef2ff; }
+    .comp-table tr.you-row td:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); padding-left: var(--space-8); }
+    .comp-table tr.you-row td:last-child  { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding-right: var(--space-8); }
+    .comp-table .td-center { text-align: center; color: var(--token-text-secondary); font-size: var(--type-label-2-size); }
+    .you-label {
+      display: inline-flex; align-items: center;
+      padding: 2px var(--space-6);
+      border-radius: var(--radius-sm);
+      background: var(--token-action-primary);
+      color: white; font-size: 10px; font-weight: 700;
+      margin-right: var(--space-6);
+    }
+    .score-bar-wrap { display: flex; align-items: center; gap: var(--space-8); }
+    .score-bar-track { flex: 1; height: 6px; background: #e2e8f0; border-radius: var(--radius-full); overflow: hidden; min-width: 60px; }
+    .score-bar-fill  { height: 100%; border-radius: var(--radius-full); }
+    .score-val { font-size: var(--type-label-2-size); font-weight: 700; min-width: 24px; text-align: right; }
+
+    /* ── Recommendation card ── */
+    .rec-card {
+      padding: var(--space-16);
+      border-radius: var(--radius-md);
+      display: flex; gap: var(--space-12);
+    }
+    .rec-card.pri-high   { background: var(--token-feedback-danger-subtle);  border-left: 3px solid var(--token-feedback-danger); }
+    .rec-card.pri-medium { background: var(--token-feedback-warning-subtle); border-left: 3px solid var(--token-feedback-warning); }
+    .rec-card.pri-low    { background: var(--token-feedback-success-subtle); border-left: 3px solid var(--token-feedback-success); }
+    .rec-content { flex: 1; }
+    .rec-category {
+      font-size: var(--type-caption-size);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--token-text-muted);
+      margin-bottom: var(--space-4);
+    }
+    .rec-action { font-size: var(--type-label-1-size); font-weight: 600; color: var(--token-text-primary); line-height: 1.5; margin-bottom: var(--space-6); }
+    .rec-rationale { font-size: var(--type-label-2-size); color: var(--token-text-secondary); line-height: 1.6; }
+    .rec-meta { display: flex; align-items: center; gap: var(--space-8); margin-bottom: var(--space-8); }
+    .effort-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; border: 1px solid; }
+    .effort-quick  { color: #047857; background: #d1fae5; border-color: #6ee7b7; }
+    .effort-medium { color: #b45309; background: #fef3c7; border-color: #fcd34d; }
+    .effort-long   { color: #1d4ed8; background: #dbeafe; border-color: #93c5fd; }
+
+    /* ── Response tabs ── */
+    .tab-bar {
+      display: flex;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--token-border-default);
+      scrollbar-width: none;
+    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      display: inline-flex; align-items: center; gap: var(--space-6);
+      padding: var(--space-12) var(--space-20);
+      border: none; border-bottom: 2px solid transparent;
+      background: transparent;
+      color: var(--token-text-secondary);
+      font-size: var(--type-label-2-size);
+      font-weight: var(--type-label-2-weight);
+      font-family: var(--font-family);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+      margin-bottom: -1px;
+    }
+    .tab-btn[aria-selected="true"]  { color: var(--token-text-primary); border-bottom-color: var(--token-action-primary); }
+    .tab-btn[aria-selected="false"]:hover { color: var(--token-text-primary); }
+    .tab-count {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--token-text-muted);
+    }
+    .tab-panel { padding: var(--space-20) var(--space-24); display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .response-card {
+      padding: var(--space-16);
+      border-radius: var(--radius-md);
+      background: #f8fafc;
+      border: 1px solid var(--token-border-default);
+    }
+    .response-header {
+      display: flex; align-items: center; gap: var(--space-8);
+      margin-bottom: var(--space-8);
+    }
+    .response-num {
+      font-size: var(--type-caption-size);
+      font-weight: 600;
+      color: var(--token-text-muted);
+    }
+    .response-body {
+      font-size: var(--type-caption-size);
+      line-height: 1.65;
+      color: var(--token-text-secondary);
+      white-space: pre-wrap;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    /* ── Spinner ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      flex-shrink: 0;
+    }
+    .spinner-indigo {
+      border: 2px solid #c7d2fe;
+      border-top-color: var(--token-action-primary);
+    }
+
+    /* ── Fade-in animation ── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.4s ease both; }
+
+    /* ── Utility ── */
+    .hidden { display: none !important; }
+    .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-16); }
+    .flex-wrap-gap { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+
+    /* ── Field textarea ── */
+    .field-textarea {
+      width: 100%;
+      padding: var(--space-12) var(--space-16);
+      min-height: 72px;
+      background: var(--token-bg-input);
+      border: 1px solid var(--token-border-default);
+      border-radius: var(--radius-md);
+      color: var(--token-text-primary);
+      font-size: var(--type-body-size);
+      font-family: var(--font-family);
+      transition: border-color 0.15s;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .field-textarea::placeholder { color: var(--token-text-muted); }
+    .field-textarea:focus { outline: none; border-color: var(--token-border-focus); }
+
+    /* ── Simulation comparison cards ── */
+    .sim-card {
+      background: #f8fafc;
+      border: 1px solid var(--token-border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--space-20);
+    }
+    .sim-card-header {
+      font-size: var(--type-caption-size);
+      font-weight: 600;
+      color: var(--token-text-muted);
+      margin-bottom: var(--space-16);
+      display: flex;
+      align-items: center;
+    }
+    .sim-score-num {
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: var(--space-12);
+    }
+    .sim-metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-8) 0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: var(--type-label-2-size);
+    }
+    .sim-metric-row:last-child { border-bottom: none; }
+    .sim-metric-key { color: var(--token-text-muted); }
+    .sim-metric-val { font-weight: 600; }
+    .delta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.6875rem;
+      font-weight: 700;
+    }
+    .delta-up   { background: var(--token-feedback-success-subtle); color: #15803d; }
+    .delta-down { background: var(--token-feedback-danger-subtle);  color: #b91c1c; }
+    .delta-flat { background: #f1f5f9; color: var(--token-text-muted); }
+
+    /* ── Watchlist table ── */
+    .wl-table { width: 100%; border-collapse: collapse; }
+    .wl-table th {
+      text-align: left;
+      font-size: var(--type-caption-size);
+      font-weight: 600;
+      color: var(--token-text-muted);
+      padding-bottom: var(--space-12);
+      border-bottom: 1px solid var(--token-border-default);
+      white-space: nowrap;
+    }
+    .wl-table td { padding: var(--space-12) 0; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .wl-table tr.wl-you td { background: #eef2ff; }
+    .wl-table tr.wl-you td:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); padding-left: var(--space-8); }
+    .wl-table tr.wl-you td:last-child  { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding-right: var(--space-8); }
+    .wl-rank { font-size: var(--type-caption-size); font-weight: 700; color: var(--token-text-muted); width: 24px; }
+    .wl-brand-cell { padding-right: var(--space-16); }
+    .wl-brand-name { font-size: var(--type-label-2-size); font-weight: 600; color: var(--token-text-primary); margin-bottom: var(--space-4); }
+    .wl-attr-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: var(--space-4); }
+    .wl-attr { display: inline-flex; padding: 2px 8px; border-radius: var(--radius-full); border: 1px solid var(--token-border-default); background: var(--token-bg-surface); font-size: 10px; font-weight: 500; color: var(--token-text-muted); }
+    .wl-mr { font-size: var(--type-label-2-size); font-weight: 600; color: var(--token-text-secondary); white-space: nowrap; padding-right: var(--space-16); }
+
+    /* ── Opportunity map ── */
+    .opp-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-12);
+    }
+    .opp-card {
+      border-radius: var(--radius-lg);
+      padding: var(--space-20);
+      border-left: 3px solid;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-10);
+    }
+    .opp-card.signal-strength    { background: var(--token-feedback-success-subtle); border-color: #86efac; }
+    .opp-card.signal-opportunity { background: var(--token-feedback-warning-subtle); border-color: #fcd34d; }
+    .opp-card.signal-gap         { background: var(--token-feedback-danger-subtle);  border-color: #fca5a5; }
+    .opp-signal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: 2px var(--space-8);
+      border-radius: var(--radius-full);
+      font-size: 10px;
+      font-weight: 700;
+      align-self: flex-start;
+    }
+    .opp-signal-strength    { background: #dcfce7; color: #15803d; }
+    .opp-signal-opportunity { background: #fef9c3; color: #92400e; }
+    .opp-signal-gap         { background: #fee2e2; color: #b91c1c; }
+    .opp-dimension { font-size: var(--type-label-1-size); font-weight: 700; color: var(--token-text-primary); line-height: 1.3; }
+    .opp-angle { font-size: var(--type-caption-size); color: var(--token-text-muted); font-style: italic; line-height: 1.5; }
+    .opp-metrics { display: flex; align-items: center; gap: var(--space-12); margin-top: var(--space-4); }
+    .opp-score { font-size: 1.5rem; font-weight: 800; line-height: 1; }
+    .opp-mr { font-size: var(--type-caption-size); color: var(--token-text-muted); }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+      .grid-2col { grid-template-columns: 1fr; }
+      .opp-grid  { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="page" role="main">
+
+  <!-- Page header -->
+  <header style="text-align:center; padding: var(--space-8) 0 var(--space-4);">
+    <h1 style="font-size: var(--type-title-size); font-weight: var(--type-title-weight); line-height: var(--type-title-lh); letter-spacing: -0.02em;">
+      <span style="color: #6366f1;">GEO</span> brand evaluator
+    </h1>
+    <p style="margin-top: var(--space-8); font-size: var(--type-body-size); color: var(--token-text-secondary);">
+      Measure your brand's visibility across AI models and get ranked recommendations
+    </p>
+  </header>
+
+  <!-- Evaluation form -->
+  <section class="surface" style="padding: var(--space-32);" aria-label="Evaluation form">
+    <form id="evalForm" novalidate style="display:flex; flex-direction:column; gap: var(--space-20);">
+
+      <div class="field-group">
+        <label class="field-label" for="query">Category question</label>
+        <input
+          id="query" name="query" type="text" required
+          class="field-input"
+          placeholder="e.g. What is the best site for travel booking?"
+          autocomplete="off"
+          aria-required="true"
+          aria-describedby="query-hint"
+        />
+        <p id="query-hint" style="font-size: var(--type-caption-size); color: var(--token-text-muted);">
+          Ask it the way a user would ask an AI assistant
+        </p>
+      </div>
+
+      <div class="grid-2col">
+        <div class="field-group">
+          <label class="field-label" for="brand">Brand to evaluate</label>
+          <input
+            id="brand" name="brand" type="text" required
+            class="field-input"
+            placeholder="e.g. Expedia"
+            autocomplete="off"
+            aria-required="true"
+          />
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="numSamples">Samples per model</label>
+          <select id="numSamples" name="numSamples" class="field-select" aria-describedby="samples-hint">
+            <option value="3">3 samples — fast (~20 s)</option>
+            <option value="5">5 samples — thorough (~35 s)</option>
+          </select>
+          <p id="samples-hint" style="font-size: var(--type-caption-size); color: var(--token-text-muted);">
+            More samples = more reliable ranking
+          </p>
+        </div>
+      </div>
+
+      <!-- Market / region -->
+      <div class="field-group">
+        <label class="field-label" for="locale">Market / region</label>
+        <select id="locale" name="locale" class="field-select" aria-describedby="locale-hint">
+          <option value="Global (no region)">Global — no region context</option>
+          <optgroup label="Americas">
+            <option value="United States">United States</option>
+            <option value="Canada">Canada</option>
+            <option value="Brazil">Brazil</option>
+            <option value="Mexico">Mexico</option>
+            <option value="Argentina">Argentina</option>
+          </optgroup>
+          <optgroup label="Europe">
+            <option value="United Kingdom">United Kingdom</option>
+            <option value="Germany">Germany</option>
+            <option value="France">France</option>
+            <option value="Spain">Spain</option>
+            <option value="Italy">Italy</option>
+            <option value="Netherlands">Netherlands</option>
+            <option value="Sweden">Sweden</option>
+            <option value="Poland">Poland</option>
+            <option value="Turkey">Turkey</option>
+          </optgroup>
+          <optgroup label="Asia Pacific">
+            <option value="India">India</option>
+            <option value="Japan">Japan</option>
+            <option value="China">China</option>
+            <option value="South Korea">South Korea</option>
+            <option value="Singapore">Singapore</option>
+            <option value="Australia">Australia</option>
+            <option value="Indonesia">Indonesia</option>
+            <option value="Thailand">Thailand</option>
+          </optgroup>
+          <optgroup label="Middle East & Africa">
+            <option value="UAE">UAE</option>
+            <option value="Saudi Arabia">Saudi Arabia</option>
+            <option value="South Africa">South Africa</option>
+          </optgroup>
+        </select>
+        <p id="locale-hint" style="font-size: var(--type-caption-size); color: var(--token-text-muted);">
+          Adds regional context to every AI query — results may vary by market
+        </p>
+      </div>
+
+      <!-- AI model selection -->
+      <div class="field-group">
+        <p class="field-label" id="models-label">AI models to query</p>
+        <div
+          id="providerToggles"
+          class="flex-wrap-gap"
+          role="group"
+          aria-labelledby="models-label"
+          aria-describedby="models-hint"
+        >
+          <span style="font-size: var(--type-caption-size); color: var(--token-text-muted);">Loading models…</span>
+        </div>
+        <p id="models-hint" style="font-size: var(--type-caption-size); color: var(--token-text-muted);">
+          Dimmed models need their API key added to .env
+        </p>
+      </div>
+
+      <!-- Quick examples -->
+      <div>
+        <p style="font-size: var(--type-caption-size); color: var(--token-text-muted); margin-bottom: var(--space-8);">Try an example</p>
+        <div class="flex-wrap-gap">
+          <button type="button" class="example-pill" onclick="fillExample('What is the best site for travel booking?','Expedia')">Expedia — travel booking</button>
+          <button type="button" class="example-pill" onclick="fillExample('What is the best travel credit card for frequent flyers?','Chase Sapphire Card')">Chase Sapphire — travel cards</button>
+          <button type="button" class="example-pill" onclick="fillExample('What is the best project management software for teams?','Asana')">Asana — project management</button>
+          <button type="button" class="example-pill" onclick="fillExample('What is the best cloud storage service for businesses?','Dropbox')">Dropbox — cloud storage</button>
+        </div>
+      </div>
+
+      <button type="submit" id="submitBtn" class="btn-primary">
+        <span id="btnText">Run evaluation</span>
+        <span id="btnSpinner" class="spinner hidden" aria-hidden="true"></span>
+      </button>
+
+    </form>
+  </section>
+
+  <!-- Loading state -->
+  <div
+    id="loading"
+    class="status-loading hidden"
+    role="status"
+    aria-live="polite"
+    aria-label="Evaluation in progress"
+  >
+    <span class="spinner spinner-indigo" aria-hidden="true"></span>
+    <span id="loadingText">Querying AI models…</span>
+  </div>
+
+  <!-- Error state -->
+  <div
+    id="errorAlert"
+    class="alert-error hidden"
+    role="alert"
+    aria-live="assertive"
+  >
+    <p class="alert-title" id="errorTitle">The evaluation couldn't complete</p>
+    <p class="alert-body"  id="errorBody"></p>
+    <p class="alert-action">Check the error above, adjust your inputs or API keys, and try again.</p>
+  </div>
+
+  <!-- Results -->
+  <div id="results" class="hidden fade-up" aria-live="polite">
+
+    <!-- KPI row -->
+    <div class="kpi-grid" style="margin-bottom: var(--space-12);">
+
+      <!-- Overall visibility -->
+      <div class="surface kpi-card">
+        <p class="kpi-label">Overall visibility</p>
+        <div class="gauge-wrap" role="img" aria-labelledby="scoreLabel">
+          <svg viewBox="0 0 36 36">
+            <circle class="gauge-track" cx="18" cy="18" r="15.9" fill="none" stroke-width="2.5"/>
+            <circle id="gaugeFill" class="gauge-fill" cx="18" cy="18" r="15.9" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+          </svg>
+          <div class="gauge-center">
+            <span id="scoreNum" class="gauge-num">0</span>
+            <span class="gauge-unit" id="scoreLabel">/100</span>
+          </div>
+        </div>
+        <p style="font-size: var(--type-caption-size); color: var(--token-text-muted); margin-top: var(--space-8); text-align:center;">avg across selected models</p>
+      </div>
+
+      <!-- AI rank -->
+      <div class="surface kpi-card">
+        <p class="kpi-label">AI rank</p>
+        <div id="rankNum" style="font-size: 3rem; font-weight: 800; line-height: 1;">#–</div>
+        <p id="rankSub" style="font-size: var(--type-caption-size); color: var(--token-text-muted); margin-top: var(--space-8); text-align: center;"></p>
+      </div>
+
+      <!-- AI sentiment -->
+      <div class="surface kpi-card">
+        <p class="kpi-label">AI sentiment</p>
+        <div id="sentEmoji" style="font-size: 3rem; line-height: 1;"></div>
+        <p id="sentLabel" style="font-size: var(--type-label-1-size); font-weight: 600; margin-top: var(--space-8);"></p>
+        <p id="sentCtx" style="font-size: var(--type-caption-size); color: var(--token-text-muted); margin-top: var(--space-4); text-align: center; max-width: 160px; line-height: 1.5;"></p>
+      </div>
+    </div>
+
+    <!-- Visibility by AI model -->
+    <div class="surface" style="padding: var(--space-24);">
+      <h2 class="section-label">Visibility by AI model</h2>
+      <div id="providerCards" class="provider-cards-grid"></div>
+    </div>
+
+    <!-- Overall mention rate -->
+    <div class="surface" style="padding: var(--space-20) var(--space-24);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-8);">
+        <h2 class="section-label" style="margin-bottom:0;">Overall mention rate</h2>
+        <span id="mentionRateLabel" style="font-size: var(--type-label-1-size); font-weight: 700; color: var(--token-text-primary);"></span>
+      </div>
+      <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="mentionRateBar" aria-label="Overall mention rate">
+        <div id="mentionRateFill" class="progress-fill" style="width:0%;"></div>
+      </div>
+      <p style="font-size: var(--type-caption-size); color: var(--token-text-muted); margin-top: var(--space-8);">
+        % of all AI responses (across models) that mention this brand
+      </p>
+    </div>
+
+    <!-- Presence & positioning -->
+    <div class="surface" style="padding: var(--space-24);" id="positioningSection">
+      <h2 class="section-label">Presence &amp; positioning</h2>
+      <p style="font-size: var(--type-body-size); color: var(--token-text-secondary); margin-bottom: var(--space-20);">
+        How AI models frame this brand — not just whether they mention it
+      </p>
+
+      <!-- Framing + attributes row -->
+      <div style="display:flex; gap: var(--space-24); align-items: flex-start; flex-wrap: wrap; margin-bottom: var(--space-24);">
+        <div style="flex-shrink: 0;">
+          <p style="font-size: var(--type-caption-size); font-weight: 600; color: var(--token-text-muted); margin-bottom: var(--space-8);">Framing</p>
+          <span id="framingBadge" style="display:inline-flex; align-items:center; padding: 5px 14px; border-radius: var(--radius-full); font-size: 0.8125rem; font-weight: 600;"></span>
+        </div>
+        <div style="flex: 1; min-width: 180px;">
+          <p style="font-size: var(--type-caption-size); font-weight: 600; color: var(--token-text-muted); margin-bottom: var(--space-8);">Attributes AI associates with this brand</p>
+          <div id="attributePills" class="flex-wrap-gap"></div>
+        </div>
+      </div>
+
+      <!-- Context summary -->
+      <div style="margin-bottom: var(--space-20); padding: var(--space-16); background: #f8fafc; border-radius: var(--radius-md); border-left: 3px solid #c7d2fe;">
+        <p style="font-size: var(--type-caption-size); font-weight: 600; color: var(--token-text-muted); margin-bottom: var(--space-6);">AI positioning summary</p>
+        <p id="positioningContext" style="font-size: var(--type-body-size); color: var(--token-text-secondary); line-height: 1.65;"></p>
+      </div>
+
+      <!-- Representative quotes -->
+      <div id="repQuotesWrap">
+        <p style="font-size: var(--type-caption-size); font-weight: 600; color: var(--token-text-muted); margin-bottom: var(--space-8);">Representative quotes from AI responses</p>
+        <div id="repQuotes" style="display:flex; flex-direction:column; gap: var(--space-8);"></div>
+      </div>
+    </div>
+
+    <!-- Competitive landscape -->
+    <div class="surface" style="padding: var(--space-24);">
+      <h2 class="section-label">Competitive landscape</h2>
+      <div style="overflow-x: auto;">
+        <table class="comp-table" aria-label="Competitive landscape">
+          <thead>
+            <tr>
+              <th>Brand</th>
+              <th class="center">Mentions</th>
+              <th class="center">Avg rank</th>
+              <th>Visibility</th>
+            </tr>
+          </thead>
+          <tbody id="compTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- GEO recommendations -->
+    <div class="surface" style="padding: var(--space-24);">
+      <h2 class="section-label">GEO recommendations</h2>
+      <p style="font-size: var(--type-caption-size); color: var(--token-text-muted); margin-bottom: var(--space-16);">
+        AI-generated recommendations — verify key suggestions before acting on them
+      </p>
+      <div id="recList" style="display:flex; flex-direction:column; gap: var(--space-8);"></div>
+    </div>
+
+    <!-- Impact simulator (revealed after first evaluation) -->
+    <div class="surface hidden" id="simulationSection" style="overflow:hidden;">
+      <div style="padding: var(--space-24) var(--space-24) var(--space-20);">
+        <h2 class="section-label">Impact simulator</h2>
+        <p style="font-size: var(--type-body-size); color: var(--token-text-secondary); margin-bottom: var(--space-20);">
+          Describe a hypothetical change and see how AI models might respond — results are directional estimates, not predictions
+        </p>
+        <div class="field-group" style="margin-bottom: var(--space-16);">
+          <label class="field-label" for="changeDesc">Hypothetical change</label>
+          <textarea
+            id="changeDesc" class="field-textarea"
+            placeholder="e.g. published a comprehensive industry guide that is widely cited by major publications"
+            rows="2"
+            aria-describedby="changeDesc-hint"
+          ></textarea>
+          <p id="changeDesc-hint" style="font-size:var(--type-caption-size);color:var(--token-text-muted);">
+            Describe the change in plain language — it is injected as context into AI queries
+          </p>
+        </div>
+        <div style="margin-bottom: var(--space-20);">
+          <p style="font-size: var(--type-caption-size); color: var(--token-text-muted); margin-bottom: var(--space-8);">Quick scenarios</p>
+          <div class="flex-wrap-gap">
+            <button type="button" class="example-pill" onclick="fillChange('published a comprehensive industry guide widely cited by major publications')">Industry guide published</button>
+            <button type="button" class="example-pill" onclick="fillChange('earned 500+ positive reviews on Trustpilot and Google Reviews')">500+ positive reviews</button>
+            <button type="button" class="example-pill" onclick="fillChange('been featured prominently in TechCrunch, Forbes, and top industry media')">Featured in major press</button>
+            <button type="button" class="example-pill" onclick="fillChange('won a top industry award and been recognised as a category leader')">Won an industry award</button>
+            <button type="button" class="example-pill" onclick="fillChange('updated its Wikipedia page with comprehensive, accurate and well-cited information')">Wikipedia updated</button>
+            <button type="button" class="example-pill" onclick="fillChange('partnered with leading industry influencers who actively recommend it')">Influencer partnerships</button>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap: var(--space-16); flex-wrap:wrap;">
+          <button type="button" id="simBtn" class="btn-primary" style="max-width: 180px;">
+            <span id="simBtnText">Run simulation</span>
+            <span id="simBtnSpinner" class="spinner hidden" aria-hidden="true"></span>
+          </button>
+          <p style="font-size: var(--type-caption-size); color: var(--token-text-muted);">
+            Uses same models and sample settings as the baseline evaluation
+          </p>
+        </div>
+        <p id="simError" class="hidden" style="font-size:var(--type-caption-size);color:var(--token-feedback-danger);margin-top:var(--space-8);"></p>
+      </div>
+
+      <!-- Simulation results (hidden until first run) -->
+      <div id="simResults" class="hidden" style="border-top: 1px solid var(--token-border-default);">
+        <div style="padding: var(--space-20) var(--space-24);">
+          <p style="font-size: var(--type-caption-size); font-weight: 600; color: var(--token-text-muted); margin-bottom: var(--space-4);">Simulated change</p>
+          <p id="simChangeLabel" style="font-size: var(--type-body-size); color: var(--token-text-primary); font-style:italic; margin-bottom: var(--space-20);"></p>
+
+          <!-- Before / after cards -->
+          <div class="grid-2col" style="margin-bottom: var(--space-20);">
+            <div class="sim-card">
+              <p class="sim-card-header">Baseline</p>
+              <div id="simBaseScore" class="sim-score-num"></div>
+              <div class="sim-metric-row">
+                <span class="sim-metric-key">Mention rate</span>
+                <span id="simBaseMR" class="sim-metric-val"></span>
+              </div>
+              <div class="sim-metric-row">
+                <span class="sim-metric-key">Framing</span>
+                <span id="simBaseFraming"></span>
+              </div>
+              <div style="margin-top: var(--space-12);">
+                <p style="font-size: var(--type-caption-size); color: var(--token-text-muted); margin-bottom: var(--space-6);">Attributes</p>
+                <div id="simBaseAttrs" class="flex-wrap-gap"></div>
+              </div>
+            </div>
+            <div class="sim-card">
+              <p class="sim-card-header">After change &nbsp;<span id="simScoreDelta" class="delta-badge"></span></p>
+              <div id="simAfterScore" class="sim-score-num"></div>
+              <div class="sim-metric-row">
+                <span class="sim-metric-key">Mention rate</span>
+                <span style="display:flex;align-items:center;gap:var(--space-6);">
+                  <span id="simAfterMR" class="sim-metric-val"></span>
+                  <span id="simMRDelta" class="delta-badge"></span>
+                </span>
+              </div>
+              <div class="sim-metric-row">
+                <span class="sim-metric-key">Framing</span>
+                <span id="simAfterFraming"></span>
+              </div>
+              <div style="margin-top: var(--space-12);">
+                <p style="font-size: var(--type-caption-size); color: var(--token-text-muted); margin-bottom: var(--space-6);">Attributes</p>
+                <div id="simAfterAttrs" class="flex-wrap-gap"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Simulated positioning summary -->
+          <div style="padding: var(--space-16); background: #f8fafc; border-radius: var(--radius-md); border-left: 3px solid #c7d2fe; margin-bottom: var(--space-16);">
+            <p style="font-size: var(--type-caption-size); font-weight: 600; color: var(--token-text-muted); margin-bottom: var(--space-6);">AI positioning summary (simulated)</p>
+            <p id="simContextSummary" style="font-size: var(--type-body-size); color: var(--token-text-secondary); line-height: 1.65;"></p>
+          </div>
+
+          <!-- Simulated representative quotes -->
+          <div id="simQuotesWrap" class="hidden">
+            <p style="font-size: var(--type-caption-size); font-weight: 600; color: var(--token-text-muted); margin-bottom: var(--space-8);">Representative quotes from simulated responses</p>
+            <div id="simQuotes" style="display:flex; flex-direction:column; gap: var(--space-8);"></div>
+          </div>
+
+          <p style="font-size: var(--type-caption-size); color: var(--token-text-muted); margin-top: var(--space-16); padding-top: var(--space-16); border-top: 1px solid var(--token-border-default);">
+            Results are directional estimates. The simulation injects hypothetical context into AI queries — it does not reflect actual changes to model training data or weights.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Competitor watchlist (revealed after first evaluation) -->
+    <div class="surface hidden" id="watchlistSection" style="overflow:hidden;">
+      <div style="padding: var(--space-24) var(--space-24) var(--space-20);">
+        <h2 class="section-label">Competitor watchlist</h2>
+        <p style="font-size: var(--type-body-size); color: var(--token-text-secondary); margin-bottom: var(--space-20);">
+          Score up to 5 competitors against your brand on the same query and AI models
+        </p>
+        <div class="field-group" style="margin-bottom: var(--space-16);">
+          <label class="field-label" for="competitorInput">Competitors (comma-separated, 1–5)</label>
+          <input
+            id="competitorInput" type="text" class="field-input"
+            placeholder="e.g. Booking.com, Hotels.com, Airbnb, Vrbo"
+            autocomplete="off"
+            aria-describedby="competitor-hint"
+          />
+          <p id="competitor-hint" style="font-size:var(--type-caption-size);color:var(--token-text-muted);">
+            Enter the competitor brands exactly as they'd appear in an AI response
+          </p>
+        </div>
+        <div style="display:flex; align-items:center; gap: var(--space-16); flex-wrap:wrap;">
+          <button type="button" id="watchlistBtn" class="btn-primary" style="max-width: 200px;">
+            <span id="watchlistBtnText">Run watchlist</span>
+            <span id="watchlistBtnSpinner" class="spinner hidden" aria-hidden="true"></span>
+          </button>
+          <p style="font-size: var(--type-caption-size); color: var(--token-text-muted);">
+            Uses same query, models, and settings as the baseline evaluation
+          </p>
+        </div>
+        <p id="watchlistError" class="hidden" style="font-size:var(--type-caption-size);color:var(--token-feedback-danger);margin-top:var(--space-8);"></p>
+      </div>
+
+      <!-- Watchlist results -->
+      <div id="watchlistResults" class="hidden" style="border-top: 1px solid var(--token-border-default);">
+        <div style="padding: var(--space-20) var(--space-24);">
+          <div style="overflow-x: auto;">
+            <table class="wl-table" aria-label="Competitor watchlist">
+              <thead>
+                <tr>
+                  <th class="wl-rank">#</th>
+                  <th>Brand</th>
+                  <th>Framing</th>
+                  <th>Mention rate</th>
+                  <th>Visibility</th>
+                </tr>
+              </thead>
+              <tbody id="watchlistTable"></tbody>
+            </table>
+          </div>
+          <p style="font-size: var(--type-caption-size); color: var(--token-text-muted); margin-top: var(--space-16);">
+            All brands scored against the same AI responses — run a new evaluation to refresh.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Opportunity map (revealed after first evaluation) -->
+    <div class="surface hidden" id="opportunitySection" style="overflow:hidden;">
+      <div style="padding: var(--space-24) var(--space-24) var(--space-20);">
+        <h2 class="section-label">Opportunity map</h2>
+        <p style="font-size: var(--type-body-size); color: var(--token-text-secondary); margin-bottom: var(--space-20);">
+          Explore 6 query angles to see where your brand is strong, where it could improve, and where it's missing entirely
+        </p>
+        <div style="display:flex; align-items:center; gap: var(--space-16); flex-wrap:wrap;">
+          <button type="button" id="oppBtn" class="btn-primary" style="max-width: 200px;">
+            <span id="oppBtnText">Map opportunities</span>
+            <span id="oppBtnSpinner" class="spinner hidden" aria-hidden="true"></span>
+          </button>
+          <p style="font-size: var(--type-caption-size); color: var(--token-text-muted);">
+            Generates 6 query variations and scores your brand on each — uses Claude only, ~20 s
+          </p>
+        </div>
+        <p id="oppError" class="hidden" style="font-size:var(--type-caption-size);color:var(--token-feedback-danger);margin-top:var(--space-8);"></p>
+      </div>
+
+      <!-- Opportunity results -->
+      <div id="oppResults" class="hidden" style="border-top: 1px solid var(--token-border-default);">
+        <div style="padding: var(--space-20) var(--space-24);">
+          <!-- Summary pill row -->
+          <div id="oppSummary" class="flex-wrap-gap" style="margin-bottom: var(--space-20);"></div>
+          <!-- Cards -->
+          <div id="oppGrid" class="opp-grid"></div>
+          <p style="font-size: var(--type-caption-size); color: var(--token-text-muted); margin-top: var(--space-16);">
+            Scored using Claude with 2 samples per dimension — directional, not statistically definitive.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI responses — tabbed by model -->
+    <div class="surface" style="overflow: hidden;">
+      <div style="padding: var(--space-20) var(--space-24) var(--space-4);">
+        <h2 class="section-label" style="margin-bottom: 0;">AI responses</h2>
+      </div>
+      <div id="responseTabBar" class="tab-bar" role="tablist" aria-label="AI model responses"></div>
+      <div id="responseTabContent" class="tab-panel" role="tabpanel"></div>
+    </div>
+
+  </div><!-- /results -->
+</div><!-- /page -->
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  let allProviders = [];
+  let activeProviders = new Set();
+  let _tabProviders = [];
+  let _currentBrand = '';
+  let _lastResult   = null;
+  let _lastRequest  = {};
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function fillExample(q, b) {
+    document.getElementById('query').value = q;
+    document.getElementById('brand').value = b;
+  }
+
+  // ── Score colour ───────────────────────────────────────────────────────────
+  const FEEDBACK = {
+    success: 'var(--token-feedback-success)',
+    warning: 'var(--token-feedback-warning)',
+    danger:  'var(--token-feedback-danger)',
+  };
+  function scoreColor(s) {
+    return s >= 60 ? FEEDBACK.success : s >= 30 ? FEEDBACK.warning : FEEDBACK.danger;
+  }
+
+  // ── Load providers on boot ─────────────────────────────────────────────────
+  async function loadProviders() {
+    try {
+      const res = await fetch('/api/providers');
+      allProviders = await res.json();
+      renderProviderToggles();
+    } catch {
+      document.getElementById('providerToggles').innerHTML =
+        '<span style="font-size:var(--type-caption-size);color:var(--token-feedback-danger);">Unable to load AI models</span>';
+    }
+  }
+
+  function renderProviderToggles() {
+    const container = document.getElementById('providerToggles');
+    container.innerHTML = '';
+    activeProviders.clear();
+    allProviders.forEach(p => {
+      if (p.configured) activeProviders.add(p.name);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'provider-toggle';
+      btn.dataset.name = p.name;
+      btn.setAttribute('aria-pressed', p.configured ? 'true' : 'false');
+      btn.setAttribute('aria-label', `${p.label}${!p.configured ? ' — API key missing' : ''}`);
+      if (!p.configured) btn.setAttribute('aria-disabled', 'true');
+      btn.innerHTML = `<span class="provider-dot" style="background:${p.color}"></span>${escHtml(p.label)}`;
+      if (p.configured) {
+        btn.addEventListener('click', () => {
+          const on = activeProviders.has(p.name);
+          if (on && activeProviders.size === 1) return; // keep at least one
+          on ? activeProviders.delete(p.name) : activeProviders.add(p.name);
+          btn.setAttribute('aria-pressed', String(!on));
+        });
+      }
+      container.appendChild(btn);
+    });
+  }
+
+  // ── Form submit ────────────────────────────────────────────────────────────
+  document.getElementById('evalForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const query      = document.getElementById('query').value.trim();
+    const brand      = document.getElementById('brand').value.trim();
+    const numSamples = parseInt(document.getElementById('numSamples').value);
+    const locale     = document.getElementById('locale').value;
+    const providers  = [...activeProviders];
+    _currentBrand    = brand;
+
+    // Loading state
+    const modelNames = allProviders.filter(p => providers.includes(p.name)).map(p => p.label.split(' ')[0]);
+    document.getElementById('loadingText').textContent =
+      `Querying ${modelNames.join(', ')} across ${numSamples} samples each…`;
+
+    document.getElementById('loading').classList.remove('hidden');
+    document.getElementById('results').classList.add('hidden');
+    document.getElementById('errorAlert').classList.add('hidden');
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    document.getElementById('btnText').textContent = 'Running evaluation…';
+    document.getElementById('btnSpinner').classList.remove('hidden');
+
+    try {
+      const res = await fetch('/api/evaluate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, brand, num_samples: numSamples, providers, locale }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: res.statusText }));
+        throw new Error(err.detail || 'Evaluation failed');
+      }
+      const data = await res.json();
+      console.log('Evaluation response:', data);
+      renderResults(data);
+      // Store baseline so the impact simulator can reference it
+      _lastResult  = data;
+      _lastRequest = { query, brand, providers: [...activeProviders], locale, numSamples };
+      document.getElementById('simulationSection').classList.remove('hidden');
+      document.getElementById('watchlistSection').classList.remove('hidden');
+      document.getElementById('opportunitySection').classList.remove('hidden');
+    } catch (err) {
+      document.getElementById('errorBody').textContent = err.message;
+      document.getElementById('errorAlert').classList.remove('hidden');
+    } finally {
+      document.getElementById('loading').classList.add('hidden');
+      btn.disabled = false;
+      document.getElementById('btnText').textContent = 'Run evaluation';
+      document.getElementById('btnSpinner').classList.add('hidden');
+    }
+  });
+
+  // ── Render results ─────────────────────────────────────────────────────────
+  function renderResults(d) {
+    const el = document.getElementById('results');
+    el.classList.remove('hidden');
+    el.classList.add('fade-up');
+
+    const score = Math.round(d.visibility_score || 0);
+    const color = scoreColor(score);
+
+    // Gauge
+    document.getElementById('scoreNum').textContent = score;
+    document.getElementById('scoreNum').style.color = color;
+    const gaugeFill = document.getElementById('gaugeFill');
+    requestAnimationFrame(() => {
+      gaugeFill.style.strokeDasharray = `${score} 100`;
+      gaugeFill.style.stroke = color;
+    });
+
+    // Rank
+    if (d.rank_among_competitors) {
+      document.getElementById('rankNum').textContent = `#${d.rank_among_competitors}`;
+      document.getElementById('rankNum').style.color = color;
+      document.getElementById('rankSub').textContent = `out of ${(d.total_competitors || 0) + 1} brands`;
+    } else {
+      document.getElementById('rankNum').textContent = 'N/A';
+      document.getElementById('rankNum').style.color = 'var(--token-text-muted)';
+      document.getElementById('rankSub').textContent = 'Brand not mentioned in any AI response';
+    }
+
+    // Sentiment
+    const sentimentConfig = {
+      positive: { emoji: '😊', color: 'var(--token-feedback-success)' },
+      neutral:  { emoji: '😐', color: 'var(--token-feedback-warning)' },
+      negative: { emoji: '😟', color: 'var(--token-feedback-danger)' },
+    };
+    const sentCfg = sentimentConfig[d.sentiment_label] || sentimentConfig.neutral;
+    document.getElementById('sentEmoji').textContent = sentCfg.emoji;
+    document.getElementById('sentLabel').textContent = d.sentiment_label ? d.sentiment_label.charAt(0).toUpperCase() + d.sentiment_label.slice(1) : '';
+    document.getElementById('sentLabel').style.color = sentCfg.color;
+    document.getElementById('sentCtx').textContent = d.sentiment_context || '';
+
+    // Mention rate
+    const mr = Math.round((d.mention_rate || 0) * 100);
+    document.getElementById('mentionRateLabel').textContent = `${mr}%`;
+    document.getElementById('mentionRateBar').setAttribute('aria-valuenow', mr);
+    document.getElementById('mentionRateBar').setAttribute('aria-valuetext', `${mr}%`);
+    const fill = document.getElementById('mentionRateFill');
+    fill.style.background = color;
+    requestAnimationFrame(() => { fill.style.width = `${mr}%`; });
+
+    // Provider cards
+    const providerCardsEl = document.getElementById('providerCards');
+    providerCardsEl.innerHTML = '';
+    (d.provider_results || []).forEach(pr => {
+      const ps = Math.round(pr.visibility_score || 0);
+      const pc = scoreColor(ps);
+      const pmr = Math.round((pr.mention_rate || 0) * 100);
+      const card = document.createElement('div');
+      card.className = 'provider-result-card';
+      card.innerHTML = `
+        <div class="provider-card-name">
+          <span class="provider-dot" style="background:${pr.provider_color}; margin-right:4px;"></span>${escHtml(pr.provider_label.split(' ')[0])}
+        </div>
+        <div class="provider-card-score" style="color:${pc}">${ps}</div>
+        <div class="progress-track" style="width:100%;">
+          <div class="progress-fill" style="width:${ps}%;background:${pr.provider_color};"></div>
+        </div>
+        <p class="provider-card-meta">Mentioned ${pmr}%${pr.avg_position !== null && pr.avg_position !== undefined ? ` · rank #${pr.avg_position}` : ''}</p>`;
+      providerCardsEl.appendChild(card);
+    });
+
+    // Competitor table
+    const tbody = document.getElementById('compTable');
+    tbody.innerHTML = '';
+    tbody.appendChild(buildCompRow(d.brand, '—', d.avg_position, d.visibility_score, true));
+    (d.competitors || []).slice(0, 10).forEach(c => {
+      tbody.appendChild(buildCompRow(c.name, c.mention_count, c.avg_position, c.visibility_score, false));
+    });
+
+    // Recommendations
+    const recList = document.getElementById('recList');
+    recList.innerHTML = '';
+    (d.recommendations || []).forEach(r => {
+      const effort = r.effort || 'medium';
+      const effortLabel = { quick: 'Quick win', medium: 'Medium-term', long: 'Long-term' }[effort] || effort;
+      const action = r.action || r.suggestion || '';
+      const rationale = r.rationale || '';
+      const div = document.createElement('div');
+      div.className = `rec-card pri-${r.priority || 'low'}`;
+      div.innerHTML = `
+        <div class="rec-content">
+          <div class="rec-meta">
+            <span class="rec-category">${escHtml(r.category || '')}</span>
+            <span class="effort-badge effort-${escHtml(effort)}">${escHtml(effortLabel)}</span>
+          </div>
+          <p class="rec-action">${escHtml(action)}</p>
+          ${rationale ? `<p class="rec-rationale">${escHtml(rationale)}</p>` : ''}
+        </div>
+        <span class="badge badge-${r.priority === 'high' ? 'high' : r.priority === 'medium' ? 'medium' : 'low'}">${escHtml(r.priority || '')}</span>`;
+      recList.appendChild(div);
+    });
+
+    // Positioning
+    renderPositioning(d.brand_positioning || {});
+
+    // Response tabs
+    renderResponseTabs(d.provider_results || []);
+
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ── Positioning section ────────────────────────────────────────────────────
+  const FRAMING_CONFIG = {
+    authoritative: { label: 'Authoritative',  bg: '#f0fdf4', color: '#15803d', border: '#86efac' },
+    neutral:       { label: 'Neutral',         bg: '#eef2ff', color: '#4338ca', border: '#a5b4fc' },
+    hedged:        { label: 'Hedged',          bg: '#fffbeb', color: '#92400e', border: '#fcd34d' },
+    not_mentioned: { label: 'Not mentioned',   bg: '#f8fafc', color: '#64748b', border: '#cbd5e1' },
+  };
+
+  function renderPositioning(pos) {
+    const framing = pos.framing || 'not_mentioned';
+    const cfg = FRAMING_CONFIG[framing] || FRAMING_CONFIG.not_mentioned;
+
+    // Framing badge
+    const badge = document.getElementById('framingBadge');
+    badge.textContent = cfg.label;
+    badge.style.background = cfg.bg;
+    badge.style.color = cfg.color;
+    badge.style.border = `1px solid ${cfg.border}`;
+
+    // Attribute pills
+    const pillsEl = document.getElementById('attributePills');
+    pillsEl.innerHTML = '';
+    const attrs = Array.isArray(pos.attributes) ? pos.attributes : [];
+    if (attrs.length === 0) {
+      pillsEl.innerHTML = `<span style="font-size:var(--type-caption-size);color:var(--token-text-muted);">No distinct attributes identified</span>`;
+    } else {
+      attrs.forEach(a => {
+        const span = document.createElement('span');
+        span.textContent = a;
+        span.style.cssText = 'display:inline-flex;padding:3px 12px;border-radius:var(--radius-full);border:1px solid var(--token-border-default);background:#f8fafc;font-size:var(--type-caption-size);font-weight:500;color:var(--token-text-secondary);';
+        pillsEl.appendChild(span);
+      });
+    }
+
+    // Context summary
+    document.getElementById('positioningContext').textContent =
+      pos.context_summary || 'No positioning summary available.';
+
+    // Representative quotes
+    const quotesEl = document.getElementById('repQuotes');
+    const wrapEl   = document.getElementById('repQuotesWrap');
+    const quotes = Array.isArray(pos.representative_quotes) ? pos.representative_quotes : [];
+    if (quotes.length === 0) {
+      wrapEl.style.display = 'none';
+    } else {
+      wrapEl.style.display = '';
+      quotesEl.innerHTML = '';
+      quotes.forEach(q => {
+        const div = document.createElement('div');
+        div.style.cssText = 'padding:var(--space-12) var(--space-16);background:#f8fafc;border-radius:var(--radius-md);border:1px solid var(--token-border-default);border-left:3px solid #c7d2fe;';
+        div.innerHTML = `<p style="font-size:var(--type-body-size);color:var(--token-text-secondary);line-height:1.6;">&#8220;${escHtml(q)}&#8221;</p>`;
+        quotesEl.appendChild(div);
+      });
+    }
+  }
+
+  function buildCompRow(name, mentions, avgPos, score, isYou) {
+    const sc = Math.round(score || 0);
+    const col = scoreColor(sc);
+    const tr = document.createElement('tr');
+    if (isYou) tr.className = 'you-row';
+    const posText = (avgPos !== null && avgPos !== undefined) ? `#${typeof avgPos === 'number' ? avgPos.toFixed(1) : avgPos}` : '—';
+    tr.innerHTML = `
+      <td style="font-size:var(--type-label-2-size);font-weight:600;color:var(--token-text-primary);">
+        ${isYou ? '<span class="you-label">You</span>' : ''}${escHtml(name)}
+      </td>
+      <td class="td-center">${escHtml(String(mentions))}</td>
+      <td class="td-center">${escHtml(posText)}</td>
+      <td>
+        <div class="score-bar-wrap">
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:${sc}%;background:${col};"></div></div>
+          <span class="score-val" style="color:${col}">${sc}</span>
+        </div>
+      </td>`;
+    return tr;
+  }
+
+  // ── Response tabs ──────────────────────────────────────────────────────────
+  function renderResponseTabs(providerResults) {
+    if (!providerResults || !providerResults.length) return;
+    _tabProviders = providerResults;
+    const bar = document.getElementById('responseTabBar');
+    bar.innerHTML = '';
+    const panel = document.getElementById('responseTabContent');
+    panel.setAttribute('aria-labelledby', `tab-0`);
+
+    providerResults.forEach((pr, i) => {
+      const count = Array.isArray(pr.responses) ? pr.responses.length : 0;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tab-btn';
+      btn.id = `tab-${i}`;
+      btn.setAttribute('role', 'tab');
+      btn.setAttribute('aria-selected', String(i === 0));
+      btn.setAttribute('aria-controls', 'responseTabContent');
+      btn.innerHTML = `<span class="provider-dot" style="background:${pr.provider_color}"></span>${escHtml(pr.provider_label.split(' ')[0])} <span class="tab-count">${count}</span>`;
+      btn.addEventListener('click', () => showResponseTab(i));
+      bar.appendChild(btn);
+    });
+
+    showResponseTab(0);
+  }
+
+  function showResponseTab(index) {
+    const bar = document.getElementById('responseTabBar');
+    bar.querySelectorAll('.tab-btn').forEach((btn, i) => {
+      const active = i === index;
+      btn.setAttribute('aria-selected', String(active));
+    });
+    bar.setAttribute('aria-activedescendant', `tab-${index}`);
+
+    const pr = _tabProviders[index];
+    if (!pr) return;
+    const responses = Array.isArray(pr.responses) ? pr.responses : [];
+    const panel = document.getElementById('responseTabContent');
+    panel.setAttribute('aria-labelledby', `tab-${index}`);
+    panel.innerHTML = '';
+
+    if (responses.length === 0) {
+      panel.innerHTML = `<p style="font-size:var(--type-caption-size);color:var(--token-text-muted);">No responses recorded</p>`;
+      return;
+    }
+
+    responses.forEach((resp, i) => {
+      const brandLower = _currentBrand.toLowerCase();
+      const mentioned  = resp.toLowerCase().includes(brandLower);
+      const div = document.createElement('div');
+      div.className = 'response-card';
+      div.innerHTML = `
+        <div class="response-header">
+          <span class="response-num">Response ${i + 1}</span>
+          <span class="badge ${mentioned ? 'badge-success' : 'badge-neutral'}">${mentioned ? '✓ mentioned' : '✗ not mentioned'}</span>
+        </div>
+        <div class="response-body">${escHtml(resp)}</div>`;
+      panel.appendChild(div);
+    });
+  }
+
+  // ── Helpers ── simulation ──────────────────────────────────────────────────
+  function fillChange(text) {
+    document.getElementById('changeDesc').value = text;
+  }
+
+  function framingBadgeEl(framing) {
+    const cfg = FRAMING_CONFIG[framing] || FRAMING_CONFIG.not_mentioned;
+    const span = document.createElement('span');
+    span.textContent = cfg.label;
+    span.style.cssText = `display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--radius-full);font-size:var(--type-caption-size);font-weight:600;background:${cfg.bg};color:${cfg.color};border:1px solid ${cfg.border};`;
+    return span;
+  }
+
+  function renderAttrPills(containerId, attrs) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    const items = Array.isArray(attrs) ? attrs : [];
+    if (items.length === 0) {
+      container.innerHTML = `<span style="font-size:var(--type-caption-size);color:var(--token-text-muted);">None identified</span>`;
+    } else {
+      items.forEach(a => {
+        const span = document.createElement('span');
+        span.textContent = a;
+        span.style.cssText = 'display:inline-flex;padding:3px 10px;border-radius:var(--radius-full);border:1px solid var(--token-border-default);background:var(--token-bg-surface);font-size:var(--type-caption-size);font-weight:500;color:var(--token-text-secondary);';
+        container.appendChild(span);
+      });
+    }
+  }
+
+  function renderSimulation(sim, baseline) {
+    document.getElementById('simError').classList.add('hidden');
+    const simResults = document.getElementById('simResults');
+    simResults.classList.remove('hidden');
+
+    // Change label
+    document.getElementById('simChangeLabel').textContent = sim.change_description;
+
+    // Scores
+    const baseScore = Math.round(baseline.visibility_score || 0);
+    const afterScore = Math.round(sim.visibility_score || 0);
+    const scoreDelta = afterScore - baseScore;
+
+    const baseScoreEl = document.getElementById('simBaseScore');
+    baseScoreEl.textContent = baseScore;
+    baseScoreEl.style.color = scoreColor(baseScore);
+
+    const afterScoreEl = document.getElementById('simAfterScore');
+    afterScoreEl.textContent = afterScore;
+    afterScoreEl.style.color = scoreColor(afterScore);
+
+    const dBadge = document.getElementById('simScoreDelta');
+    if (scoreDelta > 0) {
+      dBadge.textContent = `↑ +${scoreDelta} pts`;
+      dBadge.className = 'delta-badge delta-up';
+    } else if (scoreDelta < 0) {
+      dBadge.textContent = `↓ ${scoreDelta} pts`;
+      dBadge.className = 'delta-badge delta-down';
+    } else {
+      dBadge.textContent = '= no change';
+      dBadge.className = 'delta-badge delta-flat';
+    }
+
+    // Mention rate
+    const baseMR  = Math.round((baseline.mention_rate || 0) * 100);
+    const afterMR = Math.round((sim.mention_rate || 0) * 100);
+    const mrDelta = afterMR - baseMR;
+    document.getElementById('simBaseMR').textContent  = `${baseMR}%`;
+    document.getElementById('simAfterMR').textContent = `${afterMR}%`;
+    const mrBadge = document.getElementById('simMRDelta');
+    if (mrDelta > 0) {
+      mrBadge.textContent = `↑ +${mrDelta}pp`;
+      mrBadge.className = 'delta-badge delta-up';
+    } else if (mrDelta < 0) {
+      mrBadge.textContent = `↓ ${mrDelta}pp`;
+      mrBadge.className = 'delta-badge delta-down';
+    } else {
+      mrBadge.textContent = '=';
+      mrBadge.className = 'delta-badge delta-flat';
+    }
+
+    // Framing badges
+    const baseFramingEl  = document.getElementById('simBaseFraming');
+    const afterFramingEl = document.getElementById('simAfterFraming');
+    baseFramingEl.innerHTML  = '';
+    afterFramingEl.innerHTML = '';
+    baseFramingEl.appendChild(framingBadgeEl((baseline.brand_positioning || {}).framing || 'not_mentioned'));
+    afterFramingEl.appendChild(framingBadgeEl(sim.framing || 'not_mentioned'));
+
+    // Attribute pills
+    renderAttrPills('simBaseAttrs',  (baseline.brand_positioning || {}).attributes || []);
+    renderAttrPills('simAfterAttrs', sim.attributes || []);
+
+    // Context summary
+    document.getElementById('simContextSummary').textContent =
+      sim.context_summary || 'No positioning summary available.';
+
+    // Representative quotes
+    const quotesWrap = document.getElementById('simQuotesWrap');
+    const quotesEl   = document.getElementById('simQuotes');
+    const quotes = Array.isArray(sim.representative_quotes) ? sim.representative_quotes : [];
+    if (quotes.length === 0) {
+      quotesWrap.classList.add('hidden');
+    } else {
+      quotesWrap.classList.remove('hidden');
+      quotesEl.innerHTML = '';
+      quotes.forEach(q => {
+        const div = document.createElement('div');
+        div.style.cssText = 'padding:var(--space-12) var(--space-16);background:#f8fafc;border-radius:var(--radius-md);border:1px solid var(--token-border-default);border-left:3px solid #c7d2fe;';
+        div.innerHTML = `<p style="font-size:var(--type-body-size);color:var(--token-text-secondary);line-height:1.6;">&#8220;${escHtml(q)}&#8221;</p>`;
+        quotesEl.appendChild(div);
+      });
+    }
+
+    simResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // ── Simulation form submit ─────────────────────────────────────────────────
+  document.getElementById('simBtn').addEventListener('click', async () => {
+    if (!_lastResult || !_lastRequest.query) return;
+    const changeDesc = document.getElementById('changeDesc').value.trim();
+    if (!changeDesc) {
+      document.getElementById('changeDesc').focus();
+      return;
+    }
+    document.getElementById('simError').classList.add('hidden');
+
+    const simBtn = document.getElementById('simBtn');
+    simBtn.disabled = true;
+    document.getElementById('simBtnText').textContent = 'Running simulation…';
+    document.getElementById('simBtnSpinner').classList.remove('hidden');
+
+    try {
+      const res = await fetch('/api/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query:              _lastRequest.query,
+          brand:              _lastRequest.brand,
+          change_description: changeDesc,
+          num_samples:        _lastRequest.numSamples,
+          providers:          _lastRequest.providers,
+          locale:             _lastRequest.locale,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: res.statusText }));
+        throw new Error(err.detail || 'Simulation failed');
+      }
+      const simData = await res.json();
+      renderSimulation(simData, _lastResult);
+    } catch (err) {
+      const errEl = document.getElementById('simError');
+      errEl.textContent = `Simulation failed: ${err.message}`;
+      errEl.classList.remove('hidden');
+    } finally {
+      simBtn.disabled = false;
+      document.getElementById('simBtnText').textContent = 'Run simulation';
+      document.getElementById('simBtnSpinner').classList.add('hidden');
+    }
+  });
+
+  // ── Watchlist ──────────────────────────────────────────────────────────────
+  function renderWatchlist(data) {
+    document.getElementById('watchlistError').classList.add('hidden');
+    const tbody = document.getElementById('watchlistTable');
+    tbody.innerHTML = '';
+
+    (data.entries || []).forEach((entry, i) => {
+      const sc = Math.round(entry.visibility_score || 0);
+      const col = scoreColor(sc);
+      const mr  = Math.round((entry.mention_rate || 0) * 100);
+      const cfg = FRAMING_CONFIG[entry.framing] || FRAMING_CONFIG.not_mentioned;
+
+      const attrs = (entry.attributes || []).slice(0, 3);
+      const attrPills = attrs.length
+        ? attrs.map(a => `<span class="wl-attr">${escHtml(a)}</span>`).join('')
+        : '';
+
+      const tr = document.createElement('tr');
+      if (entry.is_brand) tr.className = 'wl-you';
+      tr.innerHTML = `
+        <td class="wl-rank">${i + 1}</td>
+        <td class="wl-brand-cell">
+          <div class="wl-brand-name">
+            ${entry.is_brand ? '<span class="you-label">You</span>' : ''}${escHtml(entry.name)}
+          </div>
+          ${attrPills ? `<div class="wl-attr-pills">${attrPills}</div>` : ''}
+        </td>
+        <td style="padding-right:var(--space-16);">
+          <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--radius-full);font-size:var(--type-caption-size);font-weight:600;background:${cfg.bg};color:${cfg.color};border:1px solid ${cfg.border};">${escHtml(cfg.label)}</span>
+        </td>
+        <td class="wl-mr">${mr}%</td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:${sc}%;background:${col};"></div></div>
+            <span class="score-val" style="color:${col}">${sc}</span>
+          </div>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('watchlistResults').classList.remove('hidden');
+    document.getElementById('watchlistResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  document.getElementById('watchlistBtn').addEventListener('click', async () => {
+    if (!_lastResult || !_lastRequest.query) return;
+
+    const raw = document.getElementById('competitorInput').value;
+    const competitors = raw.split(',').map(s => s.trim()).filter(Boolean);
+
+    const errEl = document.getElementById('watchlistError');
+    if (competitors.length === 0) {
+      errEl.textContent = 'Enter at least one competitor name.';
+      errEl.classList.remove('hidden');
+      document.getElementById('competitorInput').focus();
+      return;
+    }
+    if (competitors.length > 5) {
+      errEl.textContent = 'Maximum 5 competitors allowed — remove some and try again.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    errEl.classList.add('hidden');
+
+    const btn = document.getElementById('watchlistBtn');
+    btn.disabled = true;
+    document.getElementById('watchlistBtnText').textContent = 'Running watchlist…';
+    document.getElementById('watchlistBtnSpinner').classList.remove('hidden');
+
+    try {
+      const res = await fetch('/api/watchlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query:       _lastRequest.query,
+          brand:       _lastRequest.brand,
+          competitors,
+          num_samples: _lastRequest.numSamples,
+          providers:   _lastRequest.providers,
+          locale:      _lastRequest.locale,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: res.statusText }));
+        throw new Error(err.detail || 'Watchlist failed');
+      }
+      renderWatchlist(await res.json());
+    } catch (err) {
+      errEl.textContent = `Watchlist failed: ${err.message}`;
+      errEl.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+      document.getElementById('watchlistBtnText').textContent = 'Run watchlist';
+      document.getElementById('watchlistBtnSpinner').classList.add('hidden');
+    }
+  });
+
+  // ── Opportunity map ────────────────────────────────────────────────────────
+  const SIGNAL_CONFIG = {
+    strength:    { label: 'Strength',    badgeClass: 'opp-signal-strength',    cardClass: 'signal-strength',    dot: '●' },
+    opportunity: { label: 'Opportunity', badgeClass: 'opp-signal-opportunity', cardClass: 'signal-opportunity', dot: '◐' },
+    gap:         { label: 'Gap',         badgeClass: 'opp-signal-gap',         cardClass: 'signal-gap',         dot: '○' },
+  };
+
+  function renderOpportunityMap(data) {
+    document.getElementById('oppError').classList.add('hidden');
+    const grid = document.getElementById('oppGrid');
+    grid.innerHTML = '';
+
+    // Summary row
+    const summary = document.getElementById('oppSummary');
+    summary.innerHTML = '';
+    const counts = { strength: 0, opportunity: 0, gap: 0 };
+    (data.dimensions || []).forEach(d => { if (counts[d.signal] !== undefined) counts[d.signal]++; });
+    Object.entries(counts).forEach(([signal, n]) => {
+      if (n === 0) return;
+      const cfg = SIGNAL_CONFIG[signal];
+      const span = document.createElement('span');
+      span.className = `delta-badge ${signal === 'strength' ? 'delta-up' : signal === 'gap' ? 'delta-down' : 'delta-flat'}`;
+      span.style.fontSize = 'var(--type-caption-size)';
+      span.textContent = `${cfg.dot} ${n} ${cfg.label.toLowerCase()}${n > 1 ? 's' : ''}`;
+      summary.appendChild(span);
+    });
+
+    // Cards
+    (data.dimensions || []).forEach(dim => {
+      const cfg = SIGNAL_CONFIG[dim.signal] || SIGNAL_CONFIG.gap;
+      const sc  = Math.round(dim.visibility_score || 0);
+      const mr  = Math.round((dim.mention_rate || 0) * 100);
+      const col = scoreColor(sc);
+
+      const card = document.createElement('div');
+      card.className = `opp-card ${cfg.cardClass}`;
+      card.innerHTML = `
+        <span class="opp-signal-badge ${cfg.badgeClass}">${escHtml(cfg.label)}</span>
+        <p class="opp-dimension">${escHtml(dim.dimension)}</p>
+        <div class="opp-metrics">
+          <span class="opp-score" style="color:${col}">${sc}</span>
+          <div style="flex:1;">
+            <div class="progress-track" style="margin-bottom:4px;">
+              <div class="progress-fill" style="width:${sc}%;background:${col};"></div>
+            </div>
+            <span class="opp-mr">Mentioned ${mr}%</span>
+          </div>
+        </div>
+        <p class="opp-angle">"${escHtml(dim.angle_query)}"</p>`;
+      grid.appendChild(card);
+    });
+
+    document.getElementById('oppResults').classList.remove('hidden');
+    document.getElementById('oppResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  document.getElementById('oppBtn').addEventListener('click', async () => {
+    if (!_lastResult || !_lastRequest.query) return;
+    document.getElementById('oppError').classList.add('hidden');
+
+    const btn = document.getElementById('oppBtn');
+    btn.disabled = true;
+    document.getElementById('oppBtnText').textContent = 'Mapping opportunities…';
+    document.getElementById('oppBtnSpinner').classList.remove('hidden');
+
+    try {
+      const res = await fetch('/api/opportunity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query:  _lastRequest.query,
+          brand:  _lastRequest.brand,
+          locale: _lastRequest.locale,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: res.statusText }));
+        throw new Error(err.detail || 'Opportunity mapping failed');
+      }
+      renderOpportunityMap(await res.json());
+    } catch (err) {
+      const errEl = document.getElementById('oppError');
+      errEl.textContent = `Opportunity mapping failed: ${err.message}`;
+      errEl.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+      document.getElementById('oppBtnText').textContent = 'Map opportunities';
+      document.getElementById('oppBtnSpinner').classList.add('hidden');
+    }
+  });
+
+  // ── Boot ───────────────────────────────────────────────────────────────────
+  loadProviders();
+</script>
+</body>
+</html>
